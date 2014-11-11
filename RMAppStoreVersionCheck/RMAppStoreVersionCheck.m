@@ -67,11 +67,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
         if (data) {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
             NSString *appStoreVersion = [self versionFromResultsJSON:json[@"results"]];
+            NSString *releaseNotes = [self releaseNotesFromResults:json[@"results"]];
             
             if (!appStoreVersion) {
                 error = [NSError errorWithDomain:@"com.rocketmade.VersionCheck" code:VersionCheckFailureMissingResponseData userInfo:@{NSLocalizedDescriptionKey : @"version key or bundle id not found in itunes response"}];
             }
-            version = [[RMAppVersionInformation alloc] initWithAppStoreVersion:appStoreVersion];
+            version = [[RMAppVersionInformation alloc] initWithAppStoreVersion:appStoreVersion andReleaseNotes:releaseNotes];
         }
         
         if (self.completionBlock) {
@@ -91,6 +92,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
     }
     return nil;
 }
+
+
 
 #pragma mark - Reachability code
 

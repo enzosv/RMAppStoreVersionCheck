@@ -12,16 +12,17 @@ NSString *const kUserDefaultsVersionCheckKey = @"versionCheck";
 
 @implementation RMAppVersionInformation
 
-- (instancetype)initWithAppStoreVersion:(NSString *)appStoreVersion {
+- (instancetype)initWithAppStoreVersion:(NSString *)appStoreVersion andReleaseNotes:(NSString *)releaseNotes {
     if (!appStoreVersion) {
         return nil;
     }
-
+    
     if (self = [super init]) {
         _appStoreVersion = appStoreVersion;
+        _releaseNotes = releaseNotes;
         NSMutableDictionary *knownVersions = [[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsVersionCheckKey];
         if (!knownVersions) knownVersions = [NSMutableDictionary dictionary];
-
+        
         _appStoreVersionDiscoveryDate = knownVersions[appStoreVersion];
         if (!_appStoreVersionDiscoveryDate) {
             _appStoreVersionDiscoveryDate = [NSDate date];
@@ -40,7 +41,7 @@ NSString *const kUserDefaultsVersionCheckKey = @"versionCheck";
 
 - (BOOL)newVersionAvailable {
     NSComparisonResult comparision = [self.appStoreVersion compare:self.currentVersion];
-    return comparision == NSOrderedDescending;
+    return comparision == -1;
 }
 
 - (NSString *)description {

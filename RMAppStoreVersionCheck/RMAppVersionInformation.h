@@ -11,11 +11,12 @@
 @interface RMAppVersionInformation : NSObject
 
 @property (copy, readonly, nonatomic) NSString *appStoreVersion;
+@property (copy, readonly, nonatomic) NSString *releaseNotes;
 @property (copy, readonly, nonatomic) NSString *currentVersion;
 @property (copy, readonly, nonatomic) NSDate *appStoreVersionDiscoveryDate;
 @property (assign, readonly, nonatomic) BOOL isNewDiscovery;
 
-- (instancetype)initWithAppStoreVersion:(NSString *)appStoreVersion;
+- (instancetype)initWithAppStoreVersion:(NSString *)appStoreVersion andReleaseNotes:(NSString *)releaseNotes;
 - (BOOL)newVersionAvailable;
 
 @end
