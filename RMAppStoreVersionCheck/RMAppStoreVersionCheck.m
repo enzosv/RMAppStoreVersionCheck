@@ -98,7 +98,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
         NSString *resultBundleID = result[@"bundleId"];
         assert(self.bundleID);
         if ([resultBundleID isEqualToString:self.bundleID]) {
-            return result[@"version"];
+            return result[@"releaseNotes"];
         }
     }
     return nil;
