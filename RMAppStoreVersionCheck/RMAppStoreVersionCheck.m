@@ -93,6 +93,17 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
     return nil;
 }
 
+- (NSString *)releaseNotesFromResults:(NSArray *)JSON {
+    for (NSDictionary *result in JSON) {
+        NSString *resultBundleID = result[@"bundleId"];
+        assert(self.bundleID);
+        if ([resultBundleID isEqualToString:self.bundleID]) {
+            return result[@"version"];
+        }
+    }
+    return nil;
+}
+
 
 
 #pragma mark - Reachability code
