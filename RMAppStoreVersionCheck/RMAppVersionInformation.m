@@ -20,7 +20,7 @@ NSString *const kUserDefaultsVersionCheckKey = @"versionCheck";
     if (self = [super init]) {
         _appStoreVersion = appStoreVersion;
         _releaseNotes = releaseNotes;
-        NSMutableDictionary *knownVersions = [[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsVersionCheckKey];
+        NSMutableDictionary *knownVersions = [[NSMutableDictionary alloc] initWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsVersionCheckKey]];
         if (!knownVersions) knownVersions = [NSMutableDictionary dictionary];
         
         _appStoreVersionDiscoveryDate = knownVersions[appStoreVersion];
