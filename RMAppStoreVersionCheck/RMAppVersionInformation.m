@@ -20,17 +20,27 @@ NSString *const kUserDefaultsVersionCheckKey = @"versionCheck";
     if (self = [super init]) {
         _appStoreVersion = appStoreVersion;
         _releaseNotes = releaseNotes;
-        NSMutableDictionary *knownVersions = [[NSMutableDictionary alloc] initWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsVersionCheckKey]];
-        if (!knownVersions) knownVersions = [NSMutableDictionary dictionary];
-        
-        _appStoreVersionDiscoveryDate = knownVersions[appStoreVersion];
-        if (!_appStoreVersionDiscoveryDate) {
-            _appStoreVersionDiscoveryDate = [NSDate date];
-            knownVersions[appStoreVersion] = _appStoreVersionDiscoveryDate;
-            [[NSUserDefaults standardUserDefaults] setObject:knownVersions forKey:kUserDefaultsVersionCheckKey];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            _isNewDiscovery = YES;
+        @try {
+            NSMutableDictionary *knownVersions = [[NSMutableDictionary alloc] initWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kUserDefaultsVersionCheckKey]];
+            if (!knownVersions) knownVersions = [NSMutableDictionary dictionary];
+            
+            _appStoreVersionDiscoveryDate = knownVersions[appStoreVersion];
+            if (!_appStoreVersionDiscoveryDate) {
+                _appStoreVersionDiscoveryDate = [NSDate date];
+                knownVersions[appStoreVersion] = _appStoreVersionDiscoveryDate;
+                [[NSUserDefaults standardUserDefaults] setObject:knownVersions forKey:kUserDefaultsVersionCheckKey];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                _isNewDiscovery = YES;
+            }
         }
+        @catch (NSException *exception) {
+            NSLog(@"Exception: %@", exception);
+            return nil;
+        }
+        @finally {
+            
+        }
+        
     }
     return self;
 }
