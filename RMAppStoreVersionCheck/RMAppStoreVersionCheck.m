@@ -15,6 +15,7 @@ NSString *const kItunesHostname = @"itunes.apple.com";
 @interface RMAppStoreVersionCheck()
 
 @property (copy, nonatomic) NSString *bundleID;
+@property (copy, nonatomic) NSString *lookupURL;
 @property (assign, nonatomic) SCNetworkReachabilityRef reachability;
 @property (copy, nonatomic) appStoreCheckCallbackBlock completionBlock;
 
@@ -72,34 +73,82 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
     
 }
 
+- (void)checkAppStoreVersionForLookupURL: (NSString *)lookupURL completion:(appStoreCheckCallbackBlock)completion {
+    @try {
+        NSParameterAssert(lookupURL);
+        self.lookupURL = lookupURL;
+        self.completionBlock = completion;
+        if (![self startReachability]) {
+            NSError *error = [NSError errorWithDomain:@"com.rocketmade.VersionCheck" code:VersionCheckFailureItunesNotAvailble userInfo:@{NSLocalizedDescriptionKey: @"Failed to start reachability for iTunes"}];
+            if (self.completionBlock) {
+                @try {
+                    completion(nil, error);
+                }
+                @catch (NSException *exception) {
+                    
+                }
+                @finally {
+                    
+                }
+                
+            }
+            self.completionBlock = nil;
+        }
+    }
+    @catch (NSException *exception) {
+        
+    }
+    @finally {
+        
+    }
+    
+}
+
 #pragma mark - version check
 
 - (void)appStoreCheck {
-    assert(self.bundleID);
+    //    assert(self.bundleID);
     
     //for test new versions without waiting for Apple, I changed the url to a custom one on my server containing a json file similar to the one returned by Apple
-    NSString *urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:self.bundleID];
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
-    
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        RMAppVersionInformation *version;
-        NSError *error = connectionError;
-        if (data) {
-            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-            NSString *appStoreVersion = [self versionFromResultsJSON:json[@"results"]];
-            NSString *releaseNotes = [self releaseNotesFromResults:json[@"results"]];
-            
-            if (!appStoreVersion) {
-                error = [NSError errorWithDomain:@"com.rocketmade.VersionCheck" code:VersionCheckFailureMissingResponseData userInfo:@{NSLocalizedDescriptionKey : @"version key or bundle id not found in itunes response"}];
-            }
-            version = [[RMAppVersionInformation alloc] initWithAppStoreVersion:appStoreVersion andReleaseNotes:releaseNotes];
+    NSString *urlString;
+    @try {
+        if (self.bundleID) {
+            urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:self.bundleID];
+        }else if (self.lookupURL) {
+            urlString = self.lookupURL;
+            self.bundleID = [[NSBundle mainBundle] bundleIdentifier];
+        } else{
+            urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:[[NSBundle mainBundle] bundleIdentifier]];
         }
         
-        if (self.completionBlock) {
-            self.completionBlock(version, error);
-        }
-        self.completionBlock = nil;
-    }];
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+        
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+            RMAppVersionInformation *version;
+            NSError *error = connectionError;
+            if (data) {
+                NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+                NSString *appStoreVersion = [self versionFromResultsJSON:json[@"results"]];
+                NSString *releaseNotes = [self releaseNotesFromResults:json[@"results"]];
+                
+                if (!appStoreVersion) {
+                    error = [NSError errorWithDomain:@"com.rocketmade.VersionCheck" code:VersionCheckFailureMissingResponseData userInfo:@{NSLocalizedDescriptionKey : @"version key or bundle id not found in itunes response"}];
+                }
+                version = [[RMAppVersionInformation alloc] initWithAppStoreVersion:appStoreVersion andReleaseNotes:releaseNotes];
+            }
+            
+            if (self.completionBlock) {
+                self.completionBlock(version, error);
+            }
+            self.completionBlock = nil;
+        }];
+    }
+    @catch (NSException *exception) {
+        
+    }
+    @finally {
+        
+    }
 }
 
 - (NSString *)versionFromResultsJSON:(NSArray *)JSON {

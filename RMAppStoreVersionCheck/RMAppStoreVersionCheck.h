@@ -36,6 +36,8 @@ typedef void (^appStoreCheckCallbackBlock)(RMAppVersionInformation *versionInfo,
  *  @param bundleID   the apps bundle id.  Must not be nil.
  *  @param completion
  */
+
 - (void)checkAppStoreVersionForBundleID:(NSString *)bundleID completion:(appStoreCheckCallbackBlock)completion;
 
+- (void)checkAppStoreVersionForLookupURL: (NSString *)lookupURL completion:(appStoreCheckCallbackBlock)completion;
 @end
