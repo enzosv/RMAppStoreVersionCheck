@@ -76,8 +76,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
 
 - (void)appStoreCheck {
     assert(self.bundleID);
-    //    NSString *urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:self.bundleID];
-    NSString *urlString = @"http://enzosvgames.site44.com/lookup/com.scrambledeggs.Nozdormu.json";
+    
+    //for test new versions without waiting for Apple, I changed the url to a custom one on my server containing a json file similar to the one returned by Apple
+    NSString *urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:self.bundleID];
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
