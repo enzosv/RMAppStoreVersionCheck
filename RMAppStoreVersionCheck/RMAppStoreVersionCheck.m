@@ -42,23 +42,42 @@ static void ReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNet
 }
 
 - (void)checkAppStoreVersionForBundleID:(NSString *)bundleID completion:(appStoreCheckCallbackBlock)completion {
-    NSParameterAssert(bundleID);
-    self.bundleID = bundleID;
-    self.completionBlock = completion;
-    if (![self startReachability]) {
-        NSError *error = [NSError errorWithDomain:@"com.rocketmade.VersionCheck" code:VersionCheckFailureItunesNotAvailble userInfo:@{NSLocalizedDescriptionKey: @"Failed to start reachability for iTunes"}];
-        if (self.completionBlock) {
-            completion(nil, error);
+    @try {
+        NSParameterAssert(bundleID);
+        self.bundleID = bundleID;
+        self.completionBlock = completion;
+        if (![self startReachability]) {
+            NSError *error = [NSError errorWithDomain:@"com.rocketmade.VersionCheck" code:VersionCheckFailureItunesNotAvailble userInfo:@{NSLocalizedDescriptionKey: @"Failed to start reachability for iTunes"}];
+            if (self.completionBlock) {
+                @try {
+                    completion(nil, error);
+                }
+                @catch (NSException *exception) {
+                    
+                }
+                @finally {
+                    
+                }
+                
+            }
+            self.completionBlock = nil;
         }
-        self.completionBlock = nil;
     }
+    @catch (NSException *exception) {
+        
+    }
+    @finally {
+        
+    }
+    
 }
 
 #pragma mark - version check
 
 - (void)appStoreCheck {
     assert(self.bundleID);
-    NSString *urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:self.bundleID];
+    //    NSString *urlString = [@"https://itunes.apple.com/lookup?bundleId=" stringByAppendingString:self.bundleID];
+    NSString *urlString = @"http://enzosvgames.site44.com/lookup/com.scrambledeggs.Nozdormu.json";
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
